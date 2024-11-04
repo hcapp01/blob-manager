@@ -4,6 +4,13 @@ import { NextResponse } from 'next/server'
 export const runtime = 'edge'
 
 export async function DELETE(request: Request) {
+  const authHeader = request.headers.get('Authorization')
+  const token = authHeader?.split(' ')[1]
+
+  if (!token) {
+    return NextResponse.json({ error: 'No token provided' }, { status: 401 })
+  }
+
   const { url } = await request.json()
   
   // Extract filename from URL
@@ -15,7 +22,7 @@ export async function DELETE(request: Request) {
   }
 
   try {
-    await del(filename)
+    await del(filename, { token })
     return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json({ error: 'Failed to delete file' }, { status: 500 })
