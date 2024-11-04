@@ -1,0 +1,17 @@
+.DS_Store
+.env
+.env.*
+*.log
+.next
+node_modules
+components/
+app/
+public/
+*.test.*
+coverage/
+.git
+.gitignore
+.eslintrc*
+.prettier*
+tsconfig.json
+jest.config.*

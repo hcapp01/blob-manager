@@ -1,8 +1,10 @@
+'use client'
+
 import { useState, useEffect } from 'react'
 
 interface FileEditorProps {
   content: string
-  onSave: (content: string) => void
+  onSave: (content: string) => Promise<void>
   isLoading: boolean
 }
 
@@ -15,9 +17,12 @@ export function FileEditor({ content, onSave, isLoading }: FileEditorProps) {
   }, [content])
 
   const handleSave = async () => {
-    setSaving(true)
-    await onSave(editedContent)
-    setSaving(false)
+    try {
+      setSaving(true)
+      await onSave(editedContent)
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (isLoading) {

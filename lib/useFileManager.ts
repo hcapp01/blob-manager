@@ -2,11 +2,8 @@
 
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-
-interface BlobFile {
-  pathname: string
-  url: string
-}
+import { list, put, del } from '@vercel/blob'
+import { BlobFile } from './types'
 
 export function useFileManager() {
   const [files, setFiles] = useState<BlobFile[]>([])
@@ -18,14 +15,8 @@ export function useFileManager() {
 
   const fetchFiles = async () => {
     try {
-      const response = await fetch('/api/files', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      if (!response.ok) throw new Error('Failed to fetch files')
-      const data = await response.json()
-      setFiles(data.files)
+      const { blobs } = await list({ token })
+      setFiles(blobs)
     } catch (error) {
       toast.error('Failed to fetch files')
       throw error
@@ -53,21 +44,15 @@ export function useFileManager() {
 
   const handleDelete = async (url: string) => {
     try {
-      const response = await fetch('/api/files/delete', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ url }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to delete file')
+      const filename = decodeURIComponent(url.split('/').pop() || '')
+      
+      if (!filename || filename.endsWith('/')) {
+        throw new Error('Cannot delete folders')
       }
 
+      await del(url, { token })
       await fetchFiles()
+      
       if (selectedFile === url) {
         setSelectedFile(null)
         setFileContent('')
@@ -82,45 +67,41 @@ export function useFileManager() {
     if (!selectedFile) return
 
     try {
-      const response = await fetch('/api/files/edit', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ url: selectedFile, content }),
+      // Find the old file information
+      const oldFile = files.find(f => f.url === selectedFile)
+      if (!oldFile) throw new Error('File not found')
+
+      // Create new blob with updated content
+      const newBlob = await put(oldFile.pathname, content, {
+        access: 'public',
+        contentType: 'text/plain',
+        token
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to save file')
-      }
+      // Delete the old blob using its URL
+      await del(oldFile.url, { token })
+      console.log("deleted" , oldFile.url)
 
+      // Update state with new blob URL
+      setSelectedFile(newBlob.url)
       setFileContent(content)
       await fetchFiles()
-      toast.success('File saved successfully')
+      toast.success('File saved successfully1')
     } catch (error) {
+      console.error('Save error:', error)
       toast.error('Failed to save file')
     }
   }
 
   const handleCreateFile = async (filename: string, content: string) => {
     try {
-      const response = await fetch('/api/files/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ filename, content }),
+      const blob = await put(filename, content, {
+        access: 'public',
+        contentType: 'text/plain',
+        token
       })
-
-      if (!response.ok) {
-        throw new Error('Failed to create file')
-      }
-
-      const newFile = await response.json()
       await fetchFiles()
-      setSelectedFile(newFile.url)
+      setSelectedFile(blob.url)
       setFileContent(content)
       toast.success('File created successfully')
     } catch (error) {

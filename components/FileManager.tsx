@@ -2,25 +2,26 @@
 
 import { useState } from 'react'
 import { FileList } from './FileList'
-import { FileEditor } from './FileEditor'
 import { NewFileDialog } from './NewFileDialog'
 import { TokenInput } from './TokenInput'
 import { SearchBar } from './SearchBar'
-import { FileManagerContainer } from './FileManagerContainer'
-import { useFileManager } from './useFileManager'
+import { useFileManager } from '@/lib/useFileManager'
+import { BlobFile } from '@/lib/types'
 
-export default function FileManager() {
+interface FileManagerProps {
+  onFileSelect?: (file: BlobFile) => void
+}
+
+export default function FileManager({ onFileSelect }: FileManagerProps) {
   const {
     files,
     selectedFile,
-    fileContent,
     isLoading,
     token,
     setToken,
     isConnected,
     handleFileSelect,
     handleDelete,
-    handleSave,
     handleCreateFile,
     handleTokenSubmit
   } = useFileManager()
@@ -36,31 +37,34 @@ export default function FileManager() {
     return <TokenInput token={token} setToken={setToken} onSubmit={handleTokenSubmit} />
   }
 
+  const handleFileSelection = async (url: string) => {
+    const file = files.find(f => f.url === url)
+    if (file) {
+      handleFileSelect(url)
+      onFileSelect?.(file)
+    }
+  }
+
   return (
-    <FileManagerContainer>
-      <SearchBar
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        onNewFile={() => setNewFileDialogOpen(true)}
-      />
-      <FileList 
-        files={filteredFiles}
-        onSelect={handleFileSelect}
-        onDelete={handleDelete}
-        selectedFile={selectedFile}
-      />
-      {selectedFile && (
-        <FileEditor
-          content={fileContent}
-          onSave={handleSave}
-          isLoading={isLoading}
+    <div className="bg-white p-6 rounded-lg shadow-sm">
+      <div className="flex flex-col space-y-4">
+        <SearchBar
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          onNewFile={() => setNewFileDialogOpen(true)}
         />
-      )}
-      <NewFileDialog
-        isOpen={isNewFileDialogOpen}
-        onClose={() => setNewFileDialogOpen(false)}
-        onCreate={handleCreateFile}
-      />
-    </FileManagerContainer>
+        <FileList 
+          files={filteredFiles}
+          onSelect={handleFileSelection}
+          onDelete={handleDelete}
+          selectedFile={selectedFile}
+        />
+        <NewFileDialog
+          isOpen={isNewFileDialogOpen}
+          onClose={() => setNewFileDialogOpen(false)}
+          onCreate={handleCreateFile}
+        />
+      </div>
+    </div>
   )
 }
