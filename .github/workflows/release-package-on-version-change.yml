@@ -1,0 +1,53 @@
+name: Check Version and dispatch release package event
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  check-version-and-dispatch:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Compare versions
+        id: compare
+        run: |
+          current_version=$(node -p "require('./package.json').version")
+          git fetch --depth=1 origin ${{ github.event.before }}
+          git show ${{ github.event.before }}:package.json > old_package.json
+          previous_version=$(node -p "require('./old_package.json').version")
+          echo "Current Version: $current_version"
+          echo "Previous Version: $previous_version"
+          if [ "$current_version" != "$previous_version" ]; then
+            echo "Version changed. Dispatching event..."
+            echo "::set-output name=trigger::true"
+          else
+            echo "No version change detected."
+          fi
+
+      - name: Dispatch Release Event
+        if: steps.compare.outputs.trigger == 'true'
+        run: |
+          response=$(curl -s -o response.txt -w "%{http_code}" -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            -d '{"event_type": "version-update"}' \
+            ${{ github.api_url }}/repos/${{ github.repository }}/dispatches)
+          if [ "$response" -ne 204 ]; then
+            cat response.txt
+            echo "Repository dispatch failed with status code $response"
+            exit 1
+          fi
+
