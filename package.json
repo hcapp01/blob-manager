@@ -1,6 +1,6 @@
 {
   "name": "@hcapp01/blob-manager",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A React component for managing files in Vercel Blob storage",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -10,7 +10,8 @@
     "dev": "next dev",
     "start": "next start",
     "lint": "next lint",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Running dummy test...\""
   },
   "files": [
     "dist"
