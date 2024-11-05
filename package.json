@@ -1,6 +1,6 @@
 {
-  "name": "@hcapp01/vercel-blob-file-manager",
-  "version": "1.0.0",
+  "name": "@hcapp01/blob-manager",
+  "version": "1.0.1",
   "description": "A React component for managing files in Vercel Blob storage",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

@@ -5,7 +5,7 @@ A React component for managing files in Vercel Blob storage.
 ## Installation
 
 ```bash
-npm install @hcapp01/vercel-blob-file-manager
+npm install @hcapp01/blob-manager
 ```
 
 ## Usage
