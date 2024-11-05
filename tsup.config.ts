@@ -10,6 +10,8 @@ export default defineConfig({
   sourcemap: true,
   outDir: 'dist',
   target: 'es2015',
+  splitting: false,
+  minify: false,
   esbuildOptions(options) {
     options.resolveExtensions = ['.tsx', '.ts', '.jsx', '.js']
   }

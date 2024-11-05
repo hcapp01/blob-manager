@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 export interface BlobFile {
   pathname: string
   url: string
@@ -8,20 +10,18 @@ export interface FileManagerConfig {
 }
 
 export interface FileManagerProps {
-  token: string
   onFileSelect?: (file: BlobFile, content: string) => void
-  onFileDelete?: (file: BlobFile) => void
-  onFileCreate?: (file: BlobFile) => void
-  onFileUpdate?: (file: BlobFile, content: string) => void
-  className?: string
-  children?: ReactNode
+  isLoading?: boolean
+  setIsLoading?: (loading: boolean) => void
   config?: FileManagerConfig
   onConnectionChange?: (connected: boolean) => void
+  className?: string
+  children?: ReactNode
 }
 
 export interface UseFileManagerOptions {
   token: string
-  onFileSelect?: (file: BlobFile) => void
+  onFileSelect?: (file: BlobFile, content: string) => void
   onFileDelete?: (file: BlobFile) => void
   onFileCreate?: (file: BlobFile) => void
   onFileUpdate?: (file: BlobFile, content: string) => void
