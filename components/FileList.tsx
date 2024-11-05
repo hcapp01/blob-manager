@@ -3,9 +3,10 @@ interface FileListProps {
   onSelect: (url: string) => void
   onDelete: (url: string) => void
   selectedFile: string | null
+  confirmDelete?: boolean
 }
 
-export function FileList({ files, onSelect, onDelete, selectedFile }: FileListProps) {
+export function FileList({ files, onSelect, onDelete, selectedFile, confirmDelete = false }: FileListProps) {
   const formatFileName = (pathname: string) => {
     const maxLength = 30
     
@@ -25,6 +26,16 @@ export function FileList({ files, onSelect, onDelete, selectedFile }: FileListPr
   // Filter out folders (paths ending with '/')
   const fileList = files.filter(file => !file.pathname.endsWith('/'))
 
+  const handleDelete = (url: string) => {
+    if (confirmDelete) {
+      if (confirm('Are you sure you want to delete this file?')) {
+        onDelete(url)
+      }
+    } else {
+      onDelete(url)
+    }
+  }
+
   return (
     <div className="overflow-y-auto max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
       <div className="space-y-2">
@@ -43,11 +54,7 @@ export function FileList({ files, onSelect, onDelete, selectedFile }: FileListPr
               <span className="font-mono">{formatFileName(pathname)}</span>
             </button>
             <button
-              onClick={() => {
-                if (confirm('Are you sure you want to delete this file?')) {
-                  onDelete(url)
-                }
-              }}
+              onClick={() => handleDelete(url)}
               className="ml-2 p-1 text-red-600 hover:bg-red-50 rounded"
               title="Delete file"
             >

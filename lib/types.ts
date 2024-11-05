@@ -5,14 +5,19 @@ export interface BlobFile {
   url: string
 }
 
+export interface FileManagerConfig {
+  confirmDelete?: boolean
+}
+
 export interface FileManagerProps {
   token: string
-  onFileSelect?: (file: BlobFile) => void
+  onFileSelect?: (file: BlobFile, content: string) => void
   onFileDelete?: (file: BlobFile) => void
   onFileCreate?: (file: BlobFile) => void
   onFileUpdate?: (file: BlobFile, content: string) => void
   className?: string
   children?: ReactNode
+  config?: FileManagerConfig
 }
 
 export interface UseFileManagerOptions {
@@ -21,4 +26,5 @@ export interface UseFileManagerOptions {
   onFileDelete?: (file: BlobFile) => void
   onFileCreate?: (file: BlobFile) => void
   onFileUpdate?: (file: BlobFile, content: string) => void
+  config?: FileManagerConfig
 }
