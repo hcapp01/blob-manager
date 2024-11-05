@@ -7,4 +7,9 @@ export default defineConfig({
   clean: true,
   external: ['react', 'react-dom', '@vercel/blob'],
   treeshake: true,
+  sourcemap: true,
+  outDir: 'dist',
+  esbuildOptions(options) {
+    options.resolveExtensions = ['.tsx', '.ts', '.jsx', '.js']
+  }
 })
