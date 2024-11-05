@@ -11,6 +11,7 @@ export default function Home() {
   const [selectedFile, setSelectedFile] = useState<BlobFile | null>(null)
   const [fileContent, setFileContent] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isConnected, setIsConnected] = useState(false)
   const fileManagerRef = useRef<FileManagerRef>(null)
 
   const handleFileSelect = async (file: BlobFile, content: string) => {
@@ -36,7 +37,7 @@ export default function Home() {
         File Manager
       </h1>
       <div className="bg-white/30 p-12 shadow-xl ring-1 ring-gray-900/5 rounded-lg backdrop-blur-lg max-w-4xl mx-auto w-full">
-        <Uploader fileManagerRef={fileManagerRef} />
+        {isConnected && <Uploader fileManagerRef={fileManagerRef} />}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
           <FileManager 
             ref={fileManagerRef} 
@@ -44,6 +45,7 @@ export default function Home() {
             isLoading={isLoading}
             setIsLoading={setIsLoading}
             config={{ confirmDelete: false }}
+            onConnectionChange={setIsConnected}
           />
           {selectedFile && (
             <FileEditor

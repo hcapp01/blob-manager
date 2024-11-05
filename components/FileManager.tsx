@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, forwardRef, useImperativeHandle } from 'react'
+import { useState, forwardRef, useImperativeHandle, useEffect } from 'react'
 import { FileList } from './FileList'
 import { NewFileDialog } from './NewFileDialog'
 import { TokenInput } from './TokenInput'
@@ -14,18 +14,21 @@ interface FileManagerProps {
   isLoading?: boolean
   setIsLoading?: (loading: boolean) => void
   config?: FileManagerConfig
+  onConnectionChange?: (connected: boolean) => void
 }
 
 export interface FileManagerRef {
   handleCreateFile: (filename: string, content: string) => Promise<void>
   handleSaveFile: (file: BlobFile, content: string) => Promise<void>
+  isConnected: boolean
 }
 
 const FileManager = forwardRef<FileManagerRef, FileManagerProps>(({ 
   onFileSelect, 
   isLoading = false,
   setIsLoading = () => {},
-  config = { confirmDelete: false }
+  config = { confirmDelete: false },
+  onConnectionChange
 }, ref) => {
   const {
     files,
@@ -39,12 +42,14 @@ const FileManager = forwardRef<FileManagerRef, FileManagerProps>(({
     handleTokenSubmit
   } = useFileManager()
 
-  const [isNewFileDialogOpen, setNewFileDialogOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
+  useEffect(() => {
+    onConnectionChange?.(isConnected)
+  }, [isConnected, onConnectionChange])
 
   useImperativeHandle(ref, () => ({
     handleCreateFile,
-    handleSaveFile
+    handleSaveFile,
+    isConnected
   }))
 
   const handleFileSelection = async (url: string) => {
@@ -65,6 +70,9 @@ const FileManager = forwardRef<FileManagerRef, FileManagerProps>(({
       setIsLoading(false)
     }
   }
+
+  const [isNewFileDialogOpen, setNewFileDialogOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const filteredFiles = files.filter(file => 
     file.pathname.toLowerCase().includes(searchQuery.toLowerCase())

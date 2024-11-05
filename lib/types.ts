@@ -1,5 +1,3 @@
-import { ReactNode } from 'react'
-
 export interface BlobFile {
   pathname: string
   url: string
@@ -18,6 +16,7 @@ export interface FileManagerProps {
   className?: string
   children?: ReactNode
   config?: FileManagerConfig
+  onConnectionChange?: (connected: boolean) => void
 }
 
 export interface UseFileManagerOptions {
