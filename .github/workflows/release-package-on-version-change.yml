@@ -3,7 +3,7 @@ name: Check Version and dispatch release package event
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   check-version-and-dispatch:
