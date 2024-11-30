@@ -13,6 +13,7 @@ export default defineConfig({
   splitting: false,
   minify: false,
   esbuildOptions(options) {
-    options.resolveExtensions = ['.tsx', '.ts', '.jsx', '.js']
+    options.resolveExtensions = ['.tsx', '.ts', '.jsx', '.js'],
+    options.jsx = 'automatic'
   }
 })
