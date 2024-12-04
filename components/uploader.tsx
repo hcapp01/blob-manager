@@ -54,7 +54,7 @@ export default function Uploader({ fileManagerRef }: UploaderProps) {
           const reader = new FileReader()
           reader.onload = async (e) => {
             const content = e.target?.result as string
-            await fileManagerRef.current?.handleCreateFile(file.name, content)
+            await fileManagerRef.current?.handleSaveFile({ pathname: file.name, url: "" }, content)
             setFile(null)
             setData({ image: null })
             toast.success('File uploaded successfully')

@@ -41,17 +41,19 @@ export function useFileManager() {
     }
   }
 
-  const handleSaveFile = async (file: BlobFile, content: string) => {
+  const handleSaveFile = async (file: BlobFile , content: string) => {
     try {
-      // Create new blob with updated content
+      // Create new blob
       const newBlob = await put(file.pathname, content, {
         access: 'public',
         contentType: 'text/plain',
         token
       })
 
-      // Delete the old blob using its URL
-      await del(file.url, { token })
+      // If updating an existing file, delete the old blob
+      if ('url' in file && file.url) {
+        await del(file.url, { token })
+      }
 
       // Update files list
       await fetchFiles()
@@ -63,22 +65,6 @@ export function useFileManager() {
     } catch (error) {
       console.error('Save error:', error)
       toast.error('Failed to save file')
-      throw error
-    }
-  }
-
-  const handleCreateFile = async (filename: string, content: string) => {
-    try {
-      const blob = await put(filename, content, {
-        access: 'public',
-        contentType: 'text/plain',
-        token
-      })
-      await fetchFiles()
-      setSelectedFile(blob.url)
-      toast.success('File created successfully')
-    } catch (error) {
-      toast.error('Failed to create file')
       throw error
     }
   }
@@ -102,7 +88,6 @@ export function useFileManager() {
     isConnected,
     handleDelete,
     handleSaveFile,
-    handleCreateFile,
     handleTokenSubmit
   }
 }

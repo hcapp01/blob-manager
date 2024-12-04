@@ -18,8 +18,7 @@ interface FileManagerProps {
 }
 
 export interface FileManagerRef {
-  handleCreateFile: (filename: string, content: string) => Promise<void>
-  handleSaveFile: (file: BlobFile, content: string) => Promise<void>
+  handleSaveFile: (file: BlobFile | { pathname: string }, content: string) => Promise<void>
   isConnected: boolean
 }
 
@@ -37,7 +36,6 @@ const FileManager = forwardRef<FileManagerRef, FileManagerProps>(({
     setToken,
     isConnected,
     handleDelete,
-    handleCreateFile,
     handleSaveFile,
     handleTokenSubmit
   } = useFileManager()
@@ -47,7 +45,6 @@ const FileManager = forwardRef<FileManagerRef, FileManagerProps>(({
   }, [isConnected, onConnectionChange])
 
   useImperativeHandle(ref, () => ({
-    handleCreateFile,
     handleSaveFile,
     isConnected
   }))
@@ -100,7 +97,7 @@ const FileManager = forwardRef<FileManagerRef, FileManagerProps>(({
         <NewFileDialog
           isOpen={isNewFileDialogOpen}
           onClose={() => setNewFileDialogOpen(false)}
-          onCreate={handleCreateFile}
+          onCreate={(filename, content) => handleSaveFile({ pathname: filename }, content)}
         />
       </div>
     </div>
