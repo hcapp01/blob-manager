@@ -18,7 +18,7 @@ interface FileManagerProps {
 }
 
 export interface FileManagerRef {
-  handleSaveFile: (file: BlobFile | { pathname: string }, content: string) => Promise<void>
+  handleSaveFile: (file: BlobFile, content: string) => Promise<void>
   isConnected: boolean
 }
 
@@ -97,7 +97,7 @@ const FileManager = forwardRef<FileManagerRef, FileManagerProps>(({
         <NewFileDialog
           isOpen={isNewFileDialogOpen}
           onClose={() => setNewFileDialogOpen(false)}
-          onCreate={(filename, content) => handleSaveFile({ pathname: filename }, content)}
+          onCreate={(filename, content) => handleSaveFile({ pathname: filename, url: '' }, content)}
         />
       </div>
     </div>
