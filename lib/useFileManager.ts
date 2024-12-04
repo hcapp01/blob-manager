@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { list, put, del } from '@vercel/blob'
 import { BlobFile } from './types'
@@ -8,8 +8,27 @@ import { BlobFile } from './types'
 export function useFileManager() {
   const [files, setFiles] = useState<BlobFile[]>([])
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
-  const [token, setToken] = useState("vercel_blob_rw_5X49eQVT11Cu7LAB_spAr6cNxZEZvP2itU8iI9FiY2RGafR")
+  const [token, setToken] = useState('')
   const [isConnected, setIsConnected] = useState(false)
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('blobToken') || 'vercel_blob_rw_5X49eQVT11Cu7LAB_spAr6cNxZEZvP2itU8iI9FiY2RGafr'
+
+    if (storedToken) {
+      setToken(storedToken)
+      // Attempt to connect using the stored token
+      list({ token: storedToken })
+        .then(({ blobs }) => {
+          setFiles(blobs)
+          setIsConnected(true)
+        })
+        .catch(() => {
+          localStorage.removeItem('blobToken')
+          setIsConnected(false)
+          toast.error('Stored token is invalid')
+        })
+    }
+  }, [])
 
   const fetchFiles = async () => {
     try {
@@ -41,7 +60,7 @@ export function useFileManager() {
     }
   }
 
-  const handleSaveFile = async (file: BlobFile , content: string) => {
+  const handleSaveFile = async (file: BlobFile, content: string) => {
     try {
       // Create new blob
       const newBlob = await put(file.pathname, content, {
