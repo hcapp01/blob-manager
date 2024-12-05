@@ -12,8 +12,7 @@ export function useFileManager() {
   const [isConnected, setIsConnected] = useState(false)
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('blobToken') || 'vercel_blob_rw_5X49eQVT11Cu7LAB_spAr6cNxZEZvP2itU8iI9FiY2RGafr'
-
+    const storedToken = localStorage.getItem('blobToken')
     if (storedToken) {
       setToken(storedToken)
       // Attempt to connect using the stored token
@@ -88,6 +87,30 @@ export function useFileManager() {
     }
   }
 
+  const handleReadFile = async (file: BlobFile): Promise<string | null> => {
+    try {
+      let url = file.url
+      
+      // If URL is empty, find the first file that matches the filename
+      if (!url) {
+        const matchingFile = files.find(f => f.pathname === file.pathname)
+        if (!matchingFile) {
+          return null;
+        }
+        url = matchingFile.url
+      }
+
+      const response = await fetch(url)
+      if (!response.ok) {
+        throw new Error('Failed to fetch file content')
+      }
+      return await response.text()
+    } catch (error) {
+      toast.error('Failed to read file content')
+      throw error
+    }
+  }
+
   const handleTokenSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
@@ -107,6 +130,7 @@ export function useFileManager() {
     isConnected,
     handleDelete,
     handleSaveFile,
+    handleReadFile,
     handleTokenSubmit
   }
 }

@@ -10,7 +10,7 @@ import { BlobFile, FileManagerConfig } from '@/lib/types'
 import toast from 'react-hot-toast'
 
 interface FileManagerProps {
-  onFileSelect?: (file: BlobFile, content: string) => void
+  onFileSelect?: (file: BlobFile) => void
   isLoading?: boolean
   setIsLoading?: (loading: boolean) => void
   config?: FileManagerConfig
@@ -19,6 +19,7 @@ interface FileManagerProps {
 
 export interface FileManagerRef {
   handleSaveFile: (file: BlobFile, content: string) => Promise<void>
+  handleReadFile: (file: BlobFile) => Promise<string | null>
   isConnected: boolean
 }
 
@@ -37,6 +38,7 @@ const FileManager = forwardRef<FileManagerRef, FileManagerProps>(({
     isConnected,
     handleDelete,
     handleSaveFile,
+    handleReadFile,
     handleTokenSubmit
   } = useFileManager()
 
@@ -46,6 +48,7 @@ const FileManager = forwardRef<FileManagerRef, FileManagerProps>(({
 
   useImperativeHandle(ref, () => ({
     handleSaveFile,
+    handleReadFile,
     isConnected
   }))
 
@@ -54,15 +57,9 @@ const FileManager = forwardRef<FileManagerRef, FileManagerProps>(({
       setIsLoading(true)
       const file = files.find(f => f.url === url)
       if (!file) return
-
-      const response = await fetch(url)
-      if (!response.ok) {
-        throw new Error('Failed to fetch file content')
-      }
-      const content = await response.text()
-      onFileSelect?.(file, content)
+      onFileSelect?.(file)
     } catch (error) {
-      toast.error('Failed to load file content')
+      toast.error('Failed to select file')
     } finally {
       setIsLoading(false)
     }

@@ -10,7 +10,7 @@ export interface FileManagerConfig {
 }
 
 export interface FileManagerProps {
-  onFileSelect?: (file: BlobFile, content: string) => void
+  onFileSelect?: (file: BlobFile) => void
   isLoading?: boolean
   setIsLoading?: (loading: boolean) => void
   config?: FileManagerConfig
@@ -21,7 +21,7 @@ export interface FileManagerProps {
 
 export interface UseFileManagerOptions {
   token: string
-  onFileSelect?: (file: BlobFile, content: string) => void
+  onFileSelect?: (file: BlobFile) => void
   onFileDelete?: (file: BlobFile) => void
   onFileCreate?: (file: BlobFile) => void
   onFileUpdate?: (file: BlobFile, content: string) => void

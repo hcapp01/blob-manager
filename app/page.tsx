@@ -14,9 +14,19 @@ export default function Home() {
   const [isConnected, setIsConnected] = useState(false)
   const fileManagerRef = useRef<FileManagerRef>(null)
 
-  const handleFileSelect = async (file: BlobFile, content: string) => {
+  const handleFileSelect = async (file: BlobFile) => {
     setSelectedFile(file)
-    setFileContent(content)
+    if (fileManagerRef.current) {
+      try {
+        const content = await fileManagerRef.current.handleReadFile(file)
+        if (!content) {
+          throw new Error('File not found')
+        }
+        setFileContent(content)
+      } catch (error) {
+        console.error('Failed to read file:', error)
+      }
+    }
   }
 
   const handleSave = async (content: string) => {

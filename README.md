@@ -22,9 +22,16 @@ function App() {
   const [isConnected, setIsConnected] = useState(false)
   const fileManagerRef = useRef<FileManagerRef>(null)
 
-  const handleFileSelect = async (file: BlobFile, content: string) => {
+  const handleFileSelect = async (file: BlobFile) => {
     setSelectedFile(file)
-    setFileContent(content)
+    if (fileManagerRef.current) {
+      try {
+        const content = await fileManagerRef.current.handleReadFile(file)
+        setFileContent(content)
+      } catch (error) {
+        console.error('Failed to read file:', error)
+      }
+    }
   }
 
   const handleSave = async (content: string) => {
@@ -60,7 +67,7 @@ function App() {
 
 ### FileManager Props
 - `ref`: Reference to access FileManager methods
-- `onFileSelect`: Callback when a file is selected, receives file object and content
+- `onFileSelect`: Callback when a file is selected, receives file object
 - `isLoading`: Loading state for file operations
 - `setIsLoading`: Function to update loading state
 - `config`: Configuration object
@@ -69,8 +76,8 @@ function App() {
 - `className`: Optional CSS class name
 
 ### FileManagerRef Methods
-- `handleCreateFile`: Create a new file with content
-- `handleSaveFile`: Update existing file with new content
+- `handleReadFile`: Read content of a file
+- `handleSaveFile`: Create new or update existing file with content
 - `isConnected`: Boolean indicating if connected to Blob storage
 
 ### Uploader Props
@@ -80,3 +87,4 @@ function App() {
 - `content`: Current file content
 - `onSave`: Callback when saving changes
 - `isLoading`: Loading state indicator
+```
