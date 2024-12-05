@@ -61,6 +61,8 @@ export function useFileManager() {
 
   const handleSaveFile = async (file: BlobFile, content: string) => {
     try {
+      const existingFiles = file.url ? [file] : files.filter(f => f.pathname === file.pathname)
+
       // Create new blob
       const newBlob = await put(file.pathname, content, {
         access: 'public',
@@ -69,9 +71,7 @@ export function useFileManager() {
       })
 
       // If updating an existing file, delete the old blob
-      if ('url' in file && file.url) {
-        await del(file.url, { token })
-      }
+      await Promise.all(existingFiles.map(f => del(f.url, { token })))
 
       // Update files list
       await fetchFiles()
@@ -87,7 +87,7 @@ export function useFileManager() {
     }
   }
 
-  const handleReadFile = async (file: BlobFile): Promise<string | null> => {
+  const handleReadFile = async (file: BlobFile): Promise<string> => {
     try {
       let url = file.url
       
@@ -95,7 +95,7 @@ export function useFileManager() {
       if (!url) {
         const matchingFile = files.find(f => f.pathname === file.pathname)
         if (!matchingFile) {
-          return null;
+          throw new Error('File not found')
         }
         url = matchingFile.url
       }
