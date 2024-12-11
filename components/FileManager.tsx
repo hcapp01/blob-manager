@@ -18,7 +18,7 @@ interface FileManagerProps {
 }
 
 export interface FileManagerRef {
-  handleSaveFile: (file: BlobFile, content: string) => Promise<void>
+  handleSaveFile: (file: BlobFile, content: string) => Promise<string>
   handleReadFile: (file: BlobFile) => Promise<string | null>
   isConnected: boolean
 }

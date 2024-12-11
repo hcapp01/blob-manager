@@ -76,10 +76,8 @@ export function useFileManager() {
       // Update files list
       await fetchFiles()
       
-      // Update selected file with new URL
-      setSelectedFile(newBlob.url)
-      
       toast.success('File saved successfully')
+      return newBlob.url
     } catch (error) {
       console.error('Save error:', error)
       toast.error('Failed to save file')
