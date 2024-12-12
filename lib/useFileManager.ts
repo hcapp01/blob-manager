@@ -59,14 +59,14 @@ export function useFileManager() {
     }
   }
 
-  const handleSaveFile = async (file: BlobFile, content: string) => {
+  const handleSaveFile = async (file: BlobFile, content: string, isImage: boolean = false) => {
     try {
       const existingFiles = file.url ? [file] : files.filter(f => f.pathname === file.pathname)
 
       // Create new blob
       const newBlob = await put(file.pathname, content, {
         access: 'public',
-        contentType: 'text/plain',
+        contentType: isImage ? 'image/png' : 'text/plain',
         token
       })
 
